@@ -1,6 +1,6 @@
 # LIS 2026 – Lot Information System
 
-A production-grade **Lot Information System** tailored for Philippine-based deployment. The system is built for government or enterprise use with an emphasis on clarity, auditability, and long-term maintainability.
+A production-grade **Lot Information System**. Built for NHA use with an emphasis on clarity, auditability, and long-term maintainability.
 
 ## Tech stack
 
