@@ -22,7 +22,7 @@ function formatDate(s: string) {
   }
 }
 
-function formatNum(n: number | null) {
+function formatNum(n: number | null | undefined) {
   if (n == null) return "—";
   return n.toLocaleString();
 }
