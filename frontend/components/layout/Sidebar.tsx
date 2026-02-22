@@ -8,6 +8,7 @@ import {
   DocumentTextIcon,
   FolderIcon,
   ClipboardDocumentListIcon,
+  UserGroupIcon,
   MapPinIcon,
   BuildingOffice2Icon,
   BuildingStorefrontIcon,
@@ -21,6 +22,7 @@ import {
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: HomeIcon },
   { href: "/applications", label: "Applications", icon: DocumentTextIcon },
+  { href: "/beneficiaries", label: "Beneficiaries", icon: UserGroupIcon },
   { href: "/projects", label: "Projects", icon: FolderIcon },
   { href: "/programs", label: "Programs", icon: ClipboardDocumentListIcon },
   { href: "/lot-management", label: "Lot Management", icon: MapPinIcon },

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, Integer, String, Text
+from sqlalchemy import Column, Date, DateTime, Integer, String, Text
 
 from app.database import Base
 
@@ -24,3 +24,4 @@ class Beneficiary(Base):
     inp_date = Column(Date, nullable=True)
     ssp = Column(String(1), nullable=True)
     category = Column(String(10), nullable=True)
+    deleted_at = Column(DateTime(timezone=True), nullable=True)

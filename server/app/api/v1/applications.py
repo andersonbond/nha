@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -10,19 +11,23 @@ from app.schemas.application import ApplicationCreate, ApplicationResponse, Appl
 router = APIRouter()
 
 
+def _not_deleted(q):
+    return q.filter(Application.deleted_at.is_(None))
+
+
 @router.get("/", response_model=list[ApplicationResponse])
 def list_applications(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
 ):
-    items = db.query(Application).offset(skip).limit(limit).all()
+    items = _not_deleted(db.query(Application)).offset(skip).limit(limit).all()
     return items
 
 
 @router.get("/{app_id}", response_model=ApplicationResponse)
 def get_application(app_id: UUID, db: Session = Depends(get_db)):
-    app = db.query(Application).filter(Application.app_id == app_id).first()
+    app = _not_deleted(db.query(Application)).filter(Application.app_id == app_id).first()
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
     return app
@@ -43,7 +48,7 @@ def update_application(
     payload: ApplicationUpdate,
     db: Session = Depends(get_db),
 ):
-    app = db.query(Application).filter(Application.app_id == app_id).first()
+    app = _not_deleted(db.query(Application)).filter(Application.app_id == app_id).first()
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
     data = payload.model_dump(exclude_unset=True)
@@ -56,9 +61,9 @@ def update_application(
 
 @router.delete("/{app_id}", status_code=204)
 def delete_application(app_id: UUID, db: Session = Depends(get_db)):
-    app = db.query(Application).filter(Application.app_id == app_id).first()
+    app = _not_deleted(db.query(Application)).filter(Application.app_id == app_id).first()
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
-    db.delete(app)
+    app.deleted_at = datetime.now(timezone.utc)
     db.commit()
     return None

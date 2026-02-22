@@ -1,22 +1,25 @@
 export type Project = {
   project_code: string;
-  project_name: string;
-  total_area: number | null;
-  project_cost: number | null;
-  region_code: string;
-  province_code: string;
-  inp_date: string;
-  downpayment: number | null;
-  monthly_amortization: number | null;
-  interest_rate: number | null;
-  selling_price: number | null;
-  terms_yr: number | null;
-  lot_type: string;
+  project_name?: string | null;
+  project_prog_id?: number | null;
+  total_area?: number | null;
+  project_cost?: number | null;
+  region_code?: string | null;
+  province_code?: string | null;
+  inp_date?: string | null;
+  created_at?: string | null;
+  downpayment?: number | null;
+  monthly_amortization?: number | null;
+  interest_rate?: number | null;
+  selling_price?: number | null;
+  terms_yr?: number | null;
+  lot_type?: string | null;
 };
 
 export const emptyProject: Project = {
   project_code: "",
   project_name: "",
+  project_prog_id: null,
   total_area: null,
   project_cost: null,
   region_code: "",

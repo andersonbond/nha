@@ -16,6 +16,16 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Running without the backend (mock data)
+
+To run the frontend when the backend is unavailable (e.g. frontend-only deploy or demo), set:
+
+```bash
+NEXT_PUBLIC_USE_MOCK_DATA=true
+```
+
+The app will use in-memory dummy data for Projects, Programs, Applications, and Beneficiaries. List, add, edit, and delete will work for the session; data is not persisted.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

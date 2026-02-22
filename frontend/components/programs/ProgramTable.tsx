@@ -1,34 +1,21 @@
 "use client";
 
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import type { Project } from "./types";
+import type { Program } from "./types";
 
-type ProjectTableProps = {
-  projects: Project[];
-  onEdit: (project: Project) => void;
-  onDelete: (project: Project) => void;
+type ProgramTableProps = {
+  programs: Program[];
+  onEdit: (program: Program) => void;
+  onDelete: (program: Program) => void;
 };
-
-function formatDate(s: string) {
-  if (!s) return "—";
-  try {
-    return new Date(s).toLocaleDateString("en-PH", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  } catch {
-    return s;
-  }
-}
 
 function formatNum(n: number | null) {
   if (n == null) return "—";
-  return n.toLocaleString();
+  return typeof n === "number" ? n.toLocaleString() : String(n);
 }
 
-export function ProjectTable({ projects, onEdit, onDelete }: ProjectTableProps) {
-  if (projects.length === 0) {
+export function ProgramTable({ programs, onEdit, onDelete }: ProgramTableProps) {
+  if (programs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-[var(--background)] py-16 text-center shadow-subtle dark:shadow-subtle-dark">
         <div className="rounded-full border border-[var(--border-subtle)] p-4">
@@ -43,15 +30,15 @@ export function ProjectTable({ projects, onEdit, onDelete }: ProjectTableProps) 
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={1.5}
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
             />
           </svg>
         </div>
         <p className="mt-4 text-sm font-medium text-[var(--foreground)]">
-          No projects yet
+          No programs yet
         </p>
         <p className="mt-1 text-sm text-[var(--foreground)]/60">
-          Add your first project to get started.
+          Add your first program to get started.
         </p>
       </div>
     );
@@ -67,43 +54,31 @@ export function ProjectTable({ projects, onEdit, onDelete }: ProjectTableProps) 
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
-                Project Code
+                Program ID
               </th>
               <th
                 scope="col"
                 className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
-                Project Name
+                MC Ref
               </th>
               <th
                 scope="col"
                 className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
-                Region
+                Interest Rate
               </th>
               <th
                 scope="col"
                 className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
-                Total Area
+                Delinquency Rate
               </th>
               <th
                 scope="col"
                 className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
-                Project Cost
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
-                Lot Type
-              </th>
-              <th
-                scope="col"
-                className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
-                Input Date
+                Max Term (Yrs)
               </th>
               <th scope="col" className="relative px-4 py-3">
                 <span className="sr-only">Actions</span>
@@ -111,47 +86,41 @@ export function ProjectTable({ projects, onEdit, onDelete }: ProjectTableProps) 
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-subtle)]">
-            {projects.map((project) => (
+            {programs.map((program) => (
               <tr
-                key={project.project_code}
+                key={program.project_prog_id ?? program.mc_ref ?? Math.random()}
                 className="hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
               >
                 <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-primary">
-                  {project.project_code}
+                  {program.project_prog_id ?? "—"}
                 </td>
                 <td className="px-4 py-3 text-sm text-[var(--foreground)]">
-                  {project.project_name ?? "—"}
+                  {program.mc_ref ?? "—"}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-[var(--foreground)]/80">
-                  {project.region_code || "—"}
+                  {formatNum(program.interest_rate)}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-[var(--foreground)]/80">
-                  {formatNum(project.total_area)}
+                  {formatNum(program.delinquency_rate)}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-right text-sm text-[var(--foreground)]/80">
-                  {formatNum(project.project_cost)}
-                </td>
-                <td className="whitespace-nowrap px-4 py-3 text-sm text-[var(--foreground)]/80">
-                  {project.lot_type || "—"}
-                </td>
-                <td className="whitespace-nowrap px-4 py-3 text-sm text-[var(--foreground)]/80">
-                  {formatDate(project.created_at ?? project.inp_date ?? "")}
+                  {program.max_term_yrs ?? "—"}
                 </td>
                 <td className="relative whitespace-nowrap px-4 py-3 text-right">
                   <div className="flex justify-end gap-1">
                     <button
                       type="button"
-                      onClick={() => onEdit(project)}
+                      onClick={() => onEdit(program)}
                       className="min-h-[44px] min-w-[44px] rounded p-1.5 text-[var(--foreground)]/70 hover:bg-primary/10 hover:text-primary sm:min-h-0 sm:min-w-0"
-                      aria-label={`Edit ${project.project_name ?? project.project_code}`}
+                      aria-label={`Edit program ${program.project_prog_id ?? program.mc_ref}`}
                     >
                       <PencilIcon className="h-4 w-4" />
                     </button>
                     <button
                       type="button"
-                      onClick={() => onDelete(project)}
+                      onClick={() => onDelete(program)}
                       className="min-h-[44px] min-w-[44px] rounded p-1.5 text-[var(--foreground)]/70 hover:bg-red-500/10 hover:text-red-600 sm:min-h-0 sm:min-w-0"
-                      aria-label={`Delete ${project.project_name ?? project.project_code}`}
+                      aria-label={`Delete program ${program.project_prog_id ?? program.mc_ref}`}
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>
