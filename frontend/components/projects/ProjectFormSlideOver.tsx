@@ -29,7 +29,7 @@ type ProjectFormSlideOverProps = {
 
 const RATE_MAX = 999.9999;
 
-function validateProject(project: Project, _isEdit: boolean): Record<string, string> {
+function validateProject(project: Project): Record<string, string> {
   const err: Record<string, string> = {};
   const code = (project.project_code ?? "").trim();
   if (!code) err.project_code = "Project code is required.";
@@ -75,7 +75,7 @@ export function ProjectFormSlideOver({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const nextErrors = validateProject(project, isEdit);
+    const nextErrors = validateProject(project);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
     onSave(project);

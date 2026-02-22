@@ -14,7 +14,7 @@ Backend API for the **Lot Information System (LIS)**. Provides REST endpoints fo
 - [Running the server](#running-the-server)
 - [API overview](#api-overview)
 - [Migrations](#migrations)
-- [Deployment (Linux)](#deployment-linux)
+- [Deployment (Linux)](#deployment-linux) — see also [DEPLOYMENT_LINUX.md](DEPLOYMENT_LINUX.md) (full guide with PostgreSQL install)
 - [Deployment (macOS)](#deployment-macos)
 
 ---
@@ -185,13 +185,15 @@ Projects, programs, applications, and beneficiaries use **soft delete** (DELETE 
 
 ## Deployment (Linux)
 
-These steps assume a Linux server (e.g. Ubuntu/Debian) with Python 3.11+, PostgreSQL, and the app code under `/opt/lis/server` (adjust paths as needed).
+For a **full step-by-step guide** including **PostgreSQL installation** on Ubuntu/Debian and RHEL-family distros, database creation, systemd, and Nginx, see **[DEPLOYMENT_LINUX.md](DEPLOYMENT_LINUX.md)**.
+
+Summary below assumes a Linux server (e.g. Ubuntu/Debian) with Python 3.11+, PostgreSQL already installed, and the app code under `/opt/lis/server` (adjust paths as needed).
 
 **1. Install system dependencies (if needed)**
 
 ```bash
 sudo apt update
-sudo apt install -y python3.11 python3.11-venv python3-pip postgresql-client
+sudo apt install -y python3.11 python3.11-venv python3-pip postgresql postgresql-client
 ```
 
 **2. Create app user and directory (optional but recommended)**
