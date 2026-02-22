@@ -4,6 +4,10 @@ export type Program = {
   interest_rate: number;
   delinquency_rate: number;
   max_term_yrs: number | null;
+  approval_status?: string | null;
+  approved_at?: string | null;
+  approved_by?: string | null;
+  rejection_reason?: string | null;
 };
 
 export const emptyProgram: Program = {

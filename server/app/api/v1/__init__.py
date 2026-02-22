@@ -8,6 +8,7 @@ from app.api.v1.program_classifications import router as program_classifications
 from app.api.v1.programs import router as programs_router
 from app.api.v1.properties import router as properties_router
 from app.api.v1.projects import router as projects_router
+from app.api.v1.search import router as search_router
 
 api_router = APIRouter()
 api_router.include_router(applications_router, prefix="/applications", tags=["applications"])
@@ -26,3 +27,4 @@ api_router.include_router(
 api_router.include_router(programs_router, prefix="/programs", tags=["programs"])
 api_router.include_router(projects_router, prefix="/projects", tags=["projects"])
 api_router.include_router(properties_router, prefix="/properties", tags=["properties"])
+api_router.include_router(search_router, prefix="/search", tags=["search"])

@@ -80,6 +80,10 @@ class ProjectCreate(ProjectBase):
 
 
 class ProjectUpdate(ProjectBase):
+    approval_status: Optional[str] = Field(None, max_length=20)
+    approved_by: Optional[str] = Field(None, max_length=255)
+    rejection_reason: Optional[str] = None
+
     @field_validator("terms_yr")
     @classmethod
     def terms_yr_range(cls, v: Optional[int]) -> Optional[int]:
@@ -93,3 +97,7 @@ class ProjectResponse(ProjectBase):
 
     project_code: str
     created_at: Optional[datetime] = None
+    approval_status: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    approved_by: Optional[str] = None
+    rejection_reason: Optional[str] = None

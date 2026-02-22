@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -24,10 +25,16 @@ class ProgramCreate(ProgramBase):
 
 
 class ProgramUpdate(ProgramBase):
-    pass
+    approval_status: Optional[str] = Field(None, max_length=20)
+    approved_by: Optional[str] = Field(None, max_length=255)
+    rejection_reason: Optional[str] = None
 
 
 class ProgramResponse(ProgramBase):
     model_config = ConfigDict(from_attributes=True)
 
     project_prog_id: int
+    approval_status: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    approved_by: Optional[str] = None
+    rejection_reason: Optional[str] = None

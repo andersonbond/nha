@@ -8,6 +8,7 @@ import {
   DocumentTextIcon,
   FolderIcon,
   ClipboardDocumentListIcon,
+  ClipboardDocumentCheckIcon,
   UserGroupIcon,
   MapPinIcon,
   BuildingOffice2Icon,
@@ -29,6 +30,7 @@ const NAV_ITEMS = [
   { href: "/landholdings", label: "Landholdings Inventory", icon: BuildingOffice2Icon },
   { href: "/ciim", label: "CIIM", icon: BuildingStorefrontIcon },
   { href: "/lot-award-documentation", label: "Lot Award Documentation", icon: DocumentCheckIcon },
+  { href: "/approval-workflow", label: "Approval Workflow", icon: ClipboardDocumentCheckIcon },
   { href: "/reports", label: "Reports", icon: ChartBarIcon },
   { href: "/settings", label: "Settings", icon: Cog6ToothIcon },
 ];

@@ -14,6 +14,10 @@ export type Project = {
   selling_price?: number | null;
   terms_yr?: number | null;
   lot_type?: string | null;
+  approval_status?: string | null;
+  approved_at?: string | null;
+  approved_by?: string | null;
+  rejection_reason?: string | null;
 };
 
 export const emptyProject: Project = {

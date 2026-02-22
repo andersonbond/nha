@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, DateTime, Integer, Numeric, String, text
+from sqlalchemy import Column, Date, DateTime, Integer, Numeric, String, Text, text
 
 from app.database import Base
 
@@ -40,3 +40,7 @@ class Project(Base):
     selling_price = Column(Numeric(15, 2), nullable=True)
     terms_yr = Column(Integer, nullable=True)
     deleted_at = Column(DateTime(timezone=True), nullable=True)
+    approval_status = Column(String(20), server_default=text("'pending_approval'"), nullable=False)
+    approved_at = Column(DateTime(timezone=True), nullable=True)
+    approved_by = Column(String(255), nullable=True)
+    rejection_reason = Column(Text(), nullable=True)

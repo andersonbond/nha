@@ -21,6 +21,10 @@ type Project = {
   selling_price?: number | null;
   terms_yr?: number | null;
   lot_type?: string | null;
+  approval_status?: string | null;
+  approved_at?: string | null;
+  approved_by?: string | null;
+  rejection_reason?: string | null;
 };
 
 type Program = {
@@ -29,6 +33,10 @@ type Program = {
   interest_rate: number;
   delinquency_rate: number;
   max_term_yrs: number | null;
+  approval_status?: string | null;
+  approved_at?: string | null;
+  approved_by?: string | null;
+  rejection_reason?: string | null;
 };
 
 type Application = {
@@ -82,9 +90,9 @@ function uuid(): string {
 }
 
 const initialPrograms: Program[] = [
-  { project_prog_id: 1, mc_ref: "MC-2024-001", interest_rate: 6.5, delinquency_rate: 2, max_term_yrs: 25 },
-  { project_prog_id: 2, mc_ref: "MC-2024-002", interest_rate: 5.0, delinquency_rate: 1.5, max_term_yrs: 20 },
-  { project_prog_id: 3, mc_ref: "Socialized", interest_rate: 0, delinquency_rate: 0, max_term_yrs: 30 },
+  { project_prog_id: 1, mc_ref: "MC-2024-001", interest_rate: 6.5, delinquency_rate: 2, max_term_yrs: 25, approval_status: "approved" },
+  { project_prog_id: 2, mc_ref: "MC-2024-002", interest_rate: 5.0, delinquency_rate: 1.5, max_term_yrs: 20, approval_status: "approved" },
+  { project_prog_id: 3, mc_ref: "Socialized", interest_rate: 0, delinquency_rate: 0, max_term_yrs: 30, approval_status: "approved" },
 ];
 
 const initialProjects: Project[] = [
@@ -98,6 +106,7 @@ const initialProjects: Project[] = [
     province_code: "0401",
     lot_type: "R",
     created_at: "2024-01-15T08:00:00Z",
+    approval_status: "approved",
   },
   {
     project_code: "PROJ-002",
@@ -109,6 +118,7 @@ const initialProjects: Project[] = [
     province_code: "0402",
     lot_type: "B",
     created_at: "2024-02-20T08:00:00Z",
+    approval_status: "approved",
   },
 ];
 
@@ -195,7 +205,64 @@ function filterProjects(list: Project[], params: URLSearchParams): Project[] {
       out = out.filter((p) => p.project_prog_id === id);
     }
   }
+  const approval_status = params.get("approval_status")?.trim();
+  if (approval_status) {
+    out = out.filter((p) => (p.approval_status ?? "pending_approval") === approval_status);
+  }
   return out;
+}
+
+function filterPrograms(list: Program[], params: URLSearchParams): Program[] {
+  const approval_status = params.get("approval_status")?.trim();
+  if (!approval_status) return list;
+  return list.filter((p) => (p.approval_status ?? "pending_approval") === approval_status);
+}
+
+function searchProjects(list: Project[], phrase: string, limit: number): Project[] {
+  if (!phrase || phrase.length < 2) return [];
+  const lower = phrase.toLowerCase();
+  return list
+    .filter(
+      (p) =>
+        (p.project_code ?? "").toLowerCase().includes(lower) ||
+        (p.project_name ?? "").toLowerCase().includes(lower)
+    )
+    .slice(0, limit);
+}
+
+function searchPrograms(list: Program[], phrase: string, limit: number): Program[] {
+  if (!phrase || phrase.length < 2) return [];
+  const lower = phrase.toLowerCase();
+  return list
+    .filter((p) => (p.mc_ref ?? "").toLowerCase().includes(lower))
+    .slice(0, limit);
+}
+
+function searchApplications(list: Application[], phrase: string, limit: number): Application[] {
+  if (!phrase || phrase.length < 2) return [];
+  const lower = phrase.toLowerCase();
+  return list
+    .filter(
+      (a) =>
+        (a.prequalification_no ?? "").toLowerCase().includes(lower) ||
+        (a.last_name ?? "").toLowerCase().includes(lower) ||
+        (a.first_name ?? "").toLowerCase().includes(lower)
+    )
+    .slice(0, limit);
+}
+
+function searchBeneficiaries(list: Beneficiary[], phrase: string, limit: number): Beneficiary[] {
+  if (!phrase || phrase.length < 2) return [];
+  const lower = phrase.toLowerCase();
+  return list
+    .filter(
+      (b) =>
+        (b.last_name ?? "").toLowerCase().includes(lower) ||
+        (b.first_name ?? "").toLowerCase().includes(lower) ||
+        (b.bin ?? "").toLowerCase().includes(lower) ||
+        (b.common_code ?? "").toLowerCase().includes(lower)
+    )
+    .slice(0, limit);
 }
 
 export function mockApiHandle(
@@ -213,6 +280,18 @@ export function mockApiHandle(
 
   // GET list or GET by id
   if (methodUpper === "GET") {
+    if (resource === "search") {
+      const q = params.get("q") ?? "";
+      const limitParam = params.get("limit");
+      const limit = Math.min(20, Math.max(1, parseInt(limitParam ?? "5", 10) || 5));
+      const phrase = q.trim();
+      return {
+        projects: searchProjects(projects, phrase, limit),
+        programs: searchPrograms(programs, phrase, limit),
+        applications: searchApplications(applications, phrase, limit),
+        beneficiaries: searchBeneficiaries(beneficiaries, phrase, limit),
+      };
+    }
     if (resource === "projects") {
       if (!idSegment) {
         return filterProjects(projects, params);
@@ -222,7 +301,7 @@ export function mockApiHandle(
       return found;
     }
     if (resource === "programs") {
-      if (!idSegment) return programs;
+      if (!idSegment) return filterPrograms(programs, params);
       const id = parseInt(idSegment, 10);
       const found = programs.find((p) => p.project_prog_id === id);
       if (!found) throw new Error("Program not found");
@@ -252,6 +331,7 @@ export function mockApiHandle(
         ...data,
         project_code,
         created_at: new Date().toISOString(),
+        approval_status: "pending_approval",
       } as Project;
       projects = [...projects, newProject];
       return newProject;
@@ -264,6 +344,7 @@ export function mockApiHandle(
         interest_rate: Number(data.interest_rate) ?? 0,
         delinquency_rate: Number(data.delinquency_rate) ?? 0,
         max_term_yrs: data.max_term_yrs != null ? Number(data.max_term_yrs) : null,
+        approval_status: "pending_approval",
       };
       programs = [...programs, newProgram];
       return newProgram;
@@ -284,6 +365,45 @@ export function mockApiHandle(
       const newBen: Beneficiary = { ...data, id: nextId } as Beneficiary;
       beneficiaries = [...beneficiaries, newBen];
       return newBen;
+    }
+  }
+
+  // PATCH (approval workflow)
+  if (methodUpper === "PATCH") {
+    const data = body ? (JSON.parse(body) as Record<string, unknown>) : {};
+    if (resource === "projects" && idSegment) {
+      const code = decodeURIComponent(idSegment);
+      const idx = projects.findIndex((p) => p.project_code === code);
+      if (idx === -1) throw new Error("Project not found");
+      const updated: Project = {
+        ...projects[idx],
+        ...(data.approval_status !== undefined && { approval_status: data.approval_status as string }),
+        ...(data.rejection_reason !== undefined && { rejection_reason: data.rejection_reason as string | null }),
+        ...(data.approved_by !== undefined && { approved_by: data.approved_by as string | null }),
+        ...(data.approval_status === "approved" && {
+          approved_at: new Date().toISOString(),
+        }),
+        project_code: code,
+      } as Project;
+      projects = projects.slice(0, idx).concat(updated, projects.slice(idx + 1));
+      return updated;
+    }
+    if (resource === "programs" && idSegment) {
+      const id = parseInt(idSegment, 10);
+      const idx = programs.findIndex((p) => p.project_prog_id === id);
+      if (idx === -1) throw new Error("Program not found");
+      const updated: Program = {
+        ...programs[idx],
+        ...(data.approval_status !== undefined && { approval_status: data.approval_status as string }),
+        ...(data.rejection_reason !== undefined && { rejection_reason: data.rejection_reason as string | null }),
+        ...(data.approved_by !== undefined && { approved_by: data.approved_by as string | null }),
+        ...(data.approval_status === "approved" && {
+          approved_at: new Date().toISOString(),
+        }),
+        project_prog_id: id,
+      } as Program;
+      programs = programs.slice(0, idx).concat(updated, programs.slice(idx + 1));
+      return updated;
     }
   }
 

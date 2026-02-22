@@ -25,6 +25,7 @@ def list_projects(
     province_code: Optional[str] = None,
     lot_type: Optional[str] = None,
     project_prog_id: Optional[int] = None,
+    approval_status: Optional[str] = None,
     db: Session = Depends(get_db),
 ):
     q = _not_deleted(db.query(Project))
@@ -40,6 +41,8 @@ def list_projects(
         q = q.filter(Project.lot_type == lot_type.strip())
     if project_prog_id is not None:
         q = q.filter(Project.project_prog_id == project_prog_id)
+    if approval_status is not None and approval_status.strip():
+        q = q.filter(Project.approval_status == approval_status.strip())
     items = q.offset(skip).limit(limit).all()
     return items
 
@@ -54,7 +57,9 @@ def get_project(project_code: str, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=ProjectResponse, status_code=201)
 def create_project(payload: ProjectCreate, db: Session = Depends(get_db)):
-    item = Project(**payload.model_dump())
+    data = payload.model_dump()
+    data.setdefault("approval_status", "pending_approval")
+    item = Project(**data)
     db.add(item)
     db.commit()
     db.refresh(item)
@@ -72,6 +77,27 @@ def update_project(
         raise HTTPException(status_code=404, detail="Project not found")
     for key, value in payload.model_dump(exclude_unset=True).items():
         setattr(item, key, value)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.patch("/{project_code}", response_model=ProjectResponse)
+def patch_project(
+    project_code: str,
+    payload: ProjectUpdate,
+    db: Session = Depends(get_db),
+):
+    item = _not_deleted(db.query(Project)).filter(Project.project_code == project_code).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Project not found")
+    data = payload.model_dump(exclude_unset=True)
+    for key, value in data.items():
+        setattr(item, key, value)
+    if "approval_status" in data and data["approval_status"] == "approved":
+        item.approved_at = datetime.now(timezone.utc)
+        if "approved_by" in data:
+            item.approved_by = data["approved_by"]
     db.commit()
     db.refresh(item)
     return item
