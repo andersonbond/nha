@@ -95,7 +95,7 @@ export function SearchDropdown({ query, results, loading, open, onClose }: Searc
                 title="Projects"
                 icon={FolderIcon}
                 items={results.projects}
-                getHref={(p) => `/projects`}
+                getHref={() => `/projects`}
                 getLabel={(p) => (p as { project_code: string }).project_code}
                 getSublabel={(p) => (p as { project_name?: string }).project_name ?? undefined}
                 onSelect={onClose}

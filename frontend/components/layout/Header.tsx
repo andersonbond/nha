@@ -111,9 +111,6 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
             placeholder="Search projects, programs, applications, beneficiaries…"
             className="w-full rounded-md border border-[var(--border-subtle)] bg-[var(--background)] py-2 pl-10 pr-3 text-sm text-[var(--foreground)] placeholder:text-gray-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             aria-label="Search"
-            aria-expanded={open}
-            aria-controls="search-results"
-            aria-autocomplete="list"
           />
           <div id="search-results">
             <SearchDropdown
