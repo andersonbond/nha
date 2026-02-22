@@ -97,7 +97,7 @@ export function SearchDropdown({ query, results, loading, open, onClose }: Searc
                 items={results.projects}
                 getHref={() => `/projects`}
                 getLabel={(p) => (p as { project_code: string }).project_code}
-                getSublabel={(p) => (p as { project_name?: string }).project_name ?? undefined}
+                getSublabel={(p) => (p as { project_name?: string }).project_name ?? ""}
                 onSelect={onClose}
               />
               <Section
@@ -119,7 +119,7 @@ export function SearchDropdown({ query, results, loading, open, onClose }: Searc
                   const name = [app.last_name, app.first_name].filter(Boolean).join(", ");
                   return name || app.app_id;
                 }}
-                getSublabel={(a) => (a as { prequalification_no?: string }).prequalification_no ?? undefined}
+                getSublabel={(a) => (a as { prequalification_no?: string }).prequalification_no ?? ""}
                 onSelect={onClose}
               />
               <Section
@@ -131,7 +131,7 @@ export function SearchDropdown({ query, results, loading, open, onClose }: Searc
                   const ben = b as { last_name?: string; first_name?: string; id?: number };
                   return [ben.last_name, ben.first_name].filter(Boolean).join(", ") || `#${ben.id}`;
                 }}
-                getSublabel={(b) => (b as { bin?: string }).bin ?? undefined}
+                getSublabel={(b) => (b as { bin?: string }).bin ?? ""}
                 onSelect={onClose}
               />
             </>
