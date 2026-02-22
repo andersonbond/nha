@@ -172,10 +172,6 @@ export default function ProjectsPage() {
       .catch((err) => setError(err instanceof Error ? err.message : String(err)));
   }
 
-  function applyFilters() {
-    setAppliedFilters({ ...filterValues });
-  }
-
   function clearFilters() {
     setFilterValues(emptyFilters);
     setAppliedFilters(emptyFilters);

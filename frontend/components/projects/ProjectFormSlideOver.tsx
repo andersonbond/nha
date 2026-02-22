@@ -29,7 +29,7 @@ type ProjectFormSlideOverProps = {
 
 const RATE_MAX = 999.9999;
 
-function validateProject(project: Project, isEdit: boolean): Record<string, string> {
+function validateProject(project: Project, _isEdit: boolean): Record<string, string> {
   const err: Record<string, string> = {};
   const code = (project.project_code ?? "").trim();
   if (!code) err.project_code = "Project code is required.";

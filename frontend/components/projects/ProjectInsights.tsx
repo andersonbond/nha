@@ -148,7 +148,7 @@ export function ProjectInsights({ projects }: ProjectInsightsProps) {
             <p className="py-4 text-center text-xs text-[var(--foreground)]/40">No data</p>
           ) : (
             <ul className="space-y-1.5">
-              {topByCost.map((p, i) => (
+              {topByCost.map((p) => (
                 <li key={p.project_code} className="flex items-center justify-between gap-2 text-xs">
                   <span className="truncate font-medium text-[var(--foreground)]">{(p.project_name || p.project_code).slice(0, 20)}{(p.project_name || p.project_code).length > 20 ? "…" : ""}</span>
                   <span className="shrink-0 font-semibold text-primary">{formatMoney(Number(p.project_cost))}</span>
