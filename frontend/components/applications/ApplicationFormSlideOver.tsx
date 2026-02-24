@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { PhilippineAddressSelect } from "@/components/address/PhilippineAddressSelect";
 import type { Application } from "./types";
 
 type ApplicationFormSlideOverProps = {
@@ -26,6 +27,20 @@ const MAX = {
   civil_status: 64,
   valid_id_type: 64,
 } as const;
+
+const TENURIAL_CODE_OPTIONS = ["", "CLOA", "CLEA", "Residential", "Agricultural", "Commercial", "Other"];
+const INDICATOR_OPTIONS = ["", "New", "Renewal", "Transfer", "Conversion", "Other"];
+const SEX_OPTIONS = ["", "Male", "Female"];
+const CIVIL_STATUS_OPTIONS = ["", "Single", "Married", "Widowed", "Separated", "Divorced", "Legally Separated", "Annulled", "Common Law"];
+const VALID_ID_TYPE_OPTIONS = ["", "National ID", "Voters ID", "Driver's License", "Passport"];
+
+function normalizeSexForSelect(value: string | null | undefined): string {
+  if (!value) return "";
+  const v = value.trim();
+  if (v === "M" || v === "Male") return "Male";
+  if (v === "F" || v === "Female") return "Female";
+  return v;
+}
 
 function validateApplication(application: Application): Record<string, string> {
   const err: Record<string, string> = {};
@@ -93,12 +108,20 @@ export function ApplicationFormSlideOver({
                 </div>
                 <div>
                   <label htmlFor="app_indicator" className="block text-sm font-medium text-[var(--foreground)]/80">Indicator</label>
-                  <input id="app_indicator" type="text" value={application.indicator ?? ""} onChange={(e) => update("indicator", e.target.value)} maxLength={MAX.indicator} className={inputClass("indicator")} />
+                  <select id="app_indicator" value={application.indicator ?? ""} onChange={(e) => update("indicator", e.target.value || null)} className={inputClass("indicator")}>
+                    {INDICATOR_OPTIONS.map((opt) => (
+                      <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
+                    ))}
+                  </select>
                   {errors.indicator && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.indicator}</p>}
                 </div>
                 <div>
                   <label htmlFor="app_tenurial_code" className="block text-sm font-medium text-[var(--foreground)]/80">Tenurial code</label>
-                  <input id="app_tenurial_code" type="text" value={application.tenurial_code ?? ""} onChange={(e) => update("tenurial_code", e.target.value)} maxLength={MAX.tenurial_code} className={inputClass("tenurial_code")} />
+                  <select id="app_tenurial_code" value={application.tenurial_code ?? ""} onChange={(e) => update("tenurial_code", e.target.value || null)} className={inputClass("tenurial_code")}>
+                    {TENURIAL_CODE_OPTIONS.map((opt) => (
+                      <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
+                    ))}
+                  </select>
                   {errors.tenurial_code && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.tenurial_code}</p>}
                 </div>
                 <div>
@@ -135,12 +158,20 @@ export function ApplicationFormSlideOver({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="app_sex" className="block text-sm font-medium text-[var(--foreground)]/80">Sex</label>
-                    <input id="app_sex" type="text" value={application.sex ?? ""} onChange={(e) => update("sex", e.target.value)} maxLength={MAX.sex} className={inputClass("sex")} />
+                    <select id="app_sex" value={normalizeSexForSelect(application.sex)} onChange={(e) => update("sex", e.target.value || null)} className={inputClass("sex")}>
+                      {SEX_OPTIONS.map((opt) => (
+                        <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
+                      ))}
+                    </select>
                     {errors.sex && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.sex}</p>}
                   </div>
                   <div>
                     <label htmlFor="app_civil_status" className="block text-sm font-medium text-[var(--foreground)]/80">Civil status</label>
-                    <input id="app_civil_status" type="text" value={application.civil_status ?? ""} onChange={(e) => update("civil_status", e.target.value)} maxLength={MAX.civil_status} className={inputClass("civil_status")} />
+                    <select id="app_civil_status" value={application.civil_status ?? ""} onChange={(e) => update("civil_status", e.target.value || null)} className={inputClass("civil_status")}>
+                      {CIVIL_STATUS_OPTIONS.map((opt) => (
+                        <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
+                      ))}
+                    </select>
                     {errors.civil_status && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.civil_status}</p>}
                   </div>
                 </div>
@@ -153,10 +184,25 @@ export function ApplicationFormSlideOver({
                   <label htmlFor="app_current_addr" className="block text-sm font-medium text-[var(--foreground)]/80">Current address</label>
                   <textarea id="app_current_addr" rows={2} value={application.current_addr ?? ""} onChange={(e) => update("current_addr", e.target.value)} className={inputClass("current_addr")} />
                 </div>
-                <div>
-                  <label htmlFor="app_address" className="block text-sm font-medium text-[var(--foreground)]/80">Address</label>
-                  <textarea id="app_address" rows={2} value={application.address ?? ""} onChange={(e) => update("address", e.target.value)} className={inputClass("address")} />
-                </div>
+                <PhilippineAddressSelect
+                  value={{
+                    region_code: application.region_code ?? "",
+                    province_code: application.province_code ?? "",
+                    municipal_code: application.municipal_code ?? "",
+                    barangay_code: application.barangay_code ?? "",
+                    district_code: application.district_code ?? "",
+                  }}
+                  onChange={(addr) => {
+                    onChange({
+                      ...application,
+                      region_code: addr.region_code || null,
+                      province_code: addr.province_code || null,
+                      municipal_code: addr.municipal_code || null,
+                      barangay_code: addr.barangay_code || null,
+                      district_code: addr.district_code || null,
+                    });
+                  }}
+                />
               </div>
             </section>
             <section>
@@ -164,7 +210,11 @@ export function ApplicationFormSlideOver({
               <div className="mt-3 space-y-3">
                 <div>
                   <label htmlFor="app_valid_id_type" className="block text-sm font-medium text-[var(--foreground)]/80">Valid ID type</label>
-                  <input id="app_valid_id_type" type="text" value={application.valid_id_type ?? ""} onChange={(e) => update("valid_id_type", e.target.value)} maxLength={MAX.valid_id_type} className={inputClass("valid_id_type")} />
+                  <select id="app_valid_id_type" value={application.valid_id_type ?? ""} onChange={(e) => update("valid_id_type", e.target.value || null)} className={inputClass("valid_id_type")}>
+                    {VALID_ID_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
+                    ))}
+                  </select>
                   {errors.valid_id_type && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.valid_id_type}</p>}
                 </div>
                 <div>

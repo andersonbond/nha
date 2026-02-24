@@ -6,6 +6,9 @@ export type Project = {
   project_cost?: number | null;
   region_code?: string | null;
   province_code?: string | null;
+  municipal_code?: string | null;
+  barangay_code?: string | null;
+  district_code?: string | null;
   inp_date?: string | null;
   created_at?: string | null;
   downpayment?: number | null;
@@ -28,6 +31,9 @@ export const emptyProject: Project = {
   project_cost: null,
   region_code: "",
   province_code: "",
+  municipal_code: "",
+  barangay_code: "",
+  district_code: "",
   inp_date: "",
   downpayment: null,
   monthly_amortization: null,

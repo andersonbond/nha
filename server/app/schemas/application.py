@@ -19,6 +19,11 @@ class ApplicationBase(BaseModel):
     sex: Optional[str] = None
     civil_status: Optional[str] = None
     address: Optional[str] = None
+    region_code: Optional[str] = None
+    province_code: Optional[str] = None
+    municipal_code: Optional[str] = None
+    barangay_code: Optional[str] = None
+    district_code: Optional[str] = None
     valid_id_image: Optional[str] = None
     valid_id_type: Optional[str] = None
 

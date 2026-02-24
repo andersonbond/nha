@@ -14,6 +14,11 @@ class BeneficiaryBase(BaseModel):
     sex: Optional[str] = None
     civil_status: Optional[str] = None
     address: Optional[str] = None
+    region_code: Optional[str] = None
+    province_code: Optional[str] = None
+    municipal_code: Optional[str] = None
+    barangay_code: Optional[str] = None
+    district_code: Optional[str] = None
     membership_code: Optional[str] = None
     old_common_code: Optional[str] = None
     common_code: Optional[str] = None

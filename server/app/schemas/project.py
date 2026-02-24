@@ -32,11 +32,11 @@ class ProjectBase(BaseModel):
     total_area: Optional[Decimal] = None
     project_cost: Optional[Decimal] = None
     lot_type: Optional[str] = Field(None, max_length=1)
-    region_code: Optional[str] = Field(None, max_length=4)
-    province_code: Optional[str] = Field(None, max_length=4)
-    municipal_code: Optional[str] = Field(None, max_length=4)
-    barangay_code: Optional[str] = Field(None, max_length=4)
-    district_code: Optional[str] = Field(None, max_length=1)
+    region_code: Optional[str] = Field(None, max_length=8)
+    province_code: Optional[str] = Field(None, max_length=12)
+    municipal_code: Optional[str] = Field(None, max_length=14)
+    barangay_code: Optional[str] = Field(None, max_length=16)
+    district_code: Optional[str] = Field(None, max_length=2)
     office_code: Optional[str] = Field(None, max_length=2)
     indicator: Optional[str] = Field(None, max_length=1)
     inp_date: Optional[date] = None

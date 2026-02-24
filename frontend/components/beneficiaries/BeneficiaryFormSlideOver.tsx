@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { PhilippineAddressSelect } from "@/components/address/PhilippineAddressSelect";
 import type { Beneficiary } from "./types";
 
 type BeneficiaryFormSlideOverProps = {
@@ -19,8 +20,8 @@ const MAX = {
   last_name: 25,
   first_name: 25,
   middle_name: 25,
-  sex: 1,
-  civil_status: 1,
+  sex: 32,
+  civil_status: 64,
   membership_code: 1,
   old_common_code: 20,
   common_code: 20,
@@ -29,6 +30,17 @@ const MAX = {
   ssp: 1,
   category: 10,
 } as const;
+
+const SEX_OPTIONS = ["", "Male", "Female"];
+const CIVIL_STATUS_OPTIONS = ["", "Single", "Married", "Widowed", "Separated", "Divorced", "Legally Separated", "Annulled", "Common Law"];
+
+function normalizeSexForSelect(value: string | null | undefined): string {
+  if (!value) return "";
+  const v = value.trim();
+  if (v === "M" || v === "Male") return "Male";
+  if (v === "F" || v === "Female") return "Female";
+  return v;
+}
 
 function validateBeneficiary(b: Beneficiary): Record<string, string> {
   const err: Record<string, string> = {};
@@ -137,18 +149,44 @@ export function BeneficiaryFormSlideOver({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="ben_sex" className="block text-sm font-medium text-[var(--foreground)]/80">Sex</label>
-                    <input id="ben_sex" type="text" value={beneficiary.sex ?? ""} onChange={(e) => update("sex", e.target.value)} maxLength={MAX.sex} className={inputClass("sex")} />
+                    <select id="ben_sex" value={normalizeSexForSelect(beneficiary.sex)} onChange={(e) => update("sex", e.target.value || null)} className={inputClass("sex")}>
+                      {SEX_OPTIONS.map((opt) => (
+                        <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
+                      ))}
+                    </select>
                     {errors.sex && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.sex}</p>}
                   </div>
                   <div>
                     <label htmlFor="ben_civil_status" className="block text-sm font-medium text-[var(--foreground)]/80">Civil status</label>
-                    <input id="ben_civil_status" type="text" value={beneficiary.civil_status ?? ""} onChange={(e) => update("civil_status", e.target.value)} maxLength={MAX.civil_status} className={inputClass("civil_status")} />
+                    <select id="ben_civil_status" value={beneficiary.civil_status ?? ""} onChange={(e) => update("civil_status", e.target.value || null)} className={inputClass("civil_status")}>
+                      {CIVIL_STATUS_OPTIONS.map((opt) => (
+                        <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
+                      ))}
+                    </select>
                     {errors.civil_status && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.civil_status}</p>}
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="ben_address" className="block text-sm font-medium text-[var(--foreground)]/80">Address</label>
-                  <textarea id="ben_address" rows={2} value={beneficiary.address ?? ""} onChange={(e) => update("address", e.target.value)} className={inputClass("address")} />
+                  <h4 className="mb-2 text-sm font-medium text-[var(--foreground)]/80">Address</h4>
+                  <PhilippineAddressSelect
+                    value={{
+                      region_code: beneficiary.region_code ?? "",
+                      province_code: beneficiary.province_code ?? "",
+                      municipal_code: beneficiary.municipal_code ?? "",
+                      barangay_code: beneficiary.barangay_code ?? "",
+                      district_code: beneficiary.district_code ?? "",
+                    }}
+                    onChange={(addr) => {
+                      onChange({
+                        ...beneficiary,
+                        region_code: addr.region_code || null,
+                        province_code: addr.province_code || null,
+                        municipal_code: addr.municipal_code || null,
+                        barangay_code: addr.barangay_code || null,
+                        district_code: addr.district_code || null,
+                      });
+                    }}
+                  />
                 </div>
               </div>
             </section>

@@ -13,6 +13,9 @@ type Project = {
   project_cost?: number | null;
   region_code?: string | null;
   province_code?: string | null;
+  municipal_code?: string | null;
+  barangay_code?: string | null;
+  district_code?: string | null;
   inp_date?: string | null;
   created_at?: string | null;
   downpayment?: number | null;
@@ -54,6 +57,11 @@ type Application = {
   sex?: string | null;
   civil_status?: string | null;
   address?: string | null;
+  region_code?: string | null;
+  province_code?: string | null;
+  municipal_code?: string | null;
+  barangay_code?: string | null;
+  district_code?: string | null;
   valid_id_image?: string | null;
   valid_id_type?: string | null;
   created_at?: string | null;
@@ -71,6 +79,11 @@ type Beneficiary = {
   sex?: string | null;
   civil_status?: string | null;
   address?: string | null;
+  region_code?: string | null;
+  province_code?: string | null;
+  municipal_code?: string | null;
+  barangay_code?: string | null;
+  district_code?: string | null;
   membership_code?: string | null;
   old_common_code?: string | null;
   common_code?: string | null;
@@ -280,6 +293,59 @@ export function mockApiHandle(
 
   // GET list or GET by id
   if (methodUpper === "GET") {
+    if (resource === "address") {
+      const sub = segments[1];
+      if (sub === "regions") {
+        return [
+          { code: "PH01", name: "Region I (Ilocos Region)" },
+          { code: "PH13", name: "National Capital Region (NCR)" },
+          { code: "PH04", name: "Region IV-A (Calabarzon)" },
+        ];
+      }
+      if (sub === "provinces") {
+        const region_code = params.get("region_code") ?? "";
+        const byRegion: Record<string, { code: string; name: string }[]> = {
+          PH01: [
+            { code: "PH01028", name: "Ilocos Norte" },
+            { code: "PH01029", name: "Ilocos Sur" },
+          ],
+          PH13: [{ code: "PH1301", name: "Metro Manila" }],
+          PH04: [
+            { code: "PH04010", name: "Batangas" },
+            { code: "PH04021", name: "Cavite" },
+          ],
+        };
+        return byRegion[region_code] ?? [];
+      }
+      if (sub === "municipalities") {
+        const province_code = params.get("province_code") ?? "";
+        const byProvince: Record<string, { code: string; name: string }[]> = {
+          PH01028: [
+            { code: "PH0102801", name: "Adams" },
+            { code: "PH0102802", name: "Bacarra" },
+          ],
+          PH1301: [{ code: "PH1301001", name: "Manila" }],
+          PH04010: [
+            { code: "PH0401001", name: "Agoncillo" },
+            { code: "PH0401002", name: "Alitagtag" },
+          ],
+        };
+        return byProvince[province_code] ?? [];
+      }
+      if (sub === "barangays") {
+        const municipal_code = params.get("municipal_code") ?? "";
+        const byMunicipal: Record<string, { code: string; name: string }[]> = {
+          PH0102801: [
+            { code: "PH0102801001", name: "Adams (Pob.)" },
+          ],
+          PH0102802: [
+            { code: "PH0102802001", name: "Bani" },
+            { code: "PH0102802002", name: "Buyon" },
+          ],
+        };
+        return byMunicipal[municipal_code] ?? [];
+      }
+    }
     if (resource === "search") {
       const q = params.get("q") ?? "";
       const limitParam = params.get("limit");
@@ -325,6 +391,9 @@ export function mockApiHandle(
   // POST
   if (methodUpper === "POST") {
     const data = body ? (JSON.parse(body) as Record<string, unknown>) : {};
+    if (resource === "address" && segments[1] === "warm") {
+      return { status: "ok" };
+    }
     if (resource === "projects") {
       const project_code = (data.project_code as string) || `MOCK-${Date.now()}`;
       const newProject: Project = {

@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.v1.address import router as address_router
 from app.api.v1.applications import router as applications_router
 from app.api.v1.beneficiaries import router as beneficiaries_router
 from app.api.v1.co_owners import router as co_owners_router
@@ -11,6 +12,7 @@ from app.api.v1.projects import router as projects_router
 from app.api.v1.search import router as search_router
 
 api_router = APIRouter()
+api_router.include_router(address_router, prefix="/address", tags=["address"])
 api_router.include_router(applications_router, prefix="/applications", tags=["applications"])
 api_router.include_router(beneficiaries_router, prefix="/beneficiaries", tags=["beneficiaries"])
 api_router.include_router(co_owners_router, prefix="/co-owners", tags=["co_owners"])

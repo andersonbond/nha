@@ -9,6 +9,11 @@ export type Beneficiary = {
   sex?: string | null;
   civil_status?: string | null;
   address?: string | null;
+  region_code?: string | null;
+  province_code?: string | null;
+  municipal_code?: string | null;
+  barangay_code?: string | null;
+  district_code?: string | null;
   membership_code?: string | null;
   old_common_code?: string | null;
   common_code?: string | null;
@@ -29,6 +34,11 @@ export const emptyBeneficiary: Beneficiary = {
   sex: "",
   civil_status: "",
   address: "",
+  region_code: "",
+  province_code: "",
+  municipal_code: "",
+  barangay_code: "",
+  district_code: "",
   membership_code: "",
   old_common_code: "",
   common_code: "",

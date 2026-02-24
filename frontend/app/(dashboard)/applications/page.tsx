@@ -25,6 +25,11 @@ function payloadFromApplication(app: Application) {
     sex: app.sex || null,
     civil_status: app.civil_status || null,
     address: app.address || null,
+    region_code: app.region_code || null,
+    province_code: app.province_code || null,
+    municipal_code: app.municipal_code || null,
+    barangay_code: app.barangay_code || null,
+    district_code: app.district_code || null,
     valid_id_image: app.valid_id_image || null,
     valid_id_type: app.valid_id_type || null,
   };

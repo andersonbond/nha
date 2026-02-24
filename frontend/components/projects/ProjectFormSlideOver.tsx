@@ -13,6 +13,7 @@ import {
   ChartBarIcon,
   ClockIcon,
 } from "@heroicons/react/24/outline";
+import { PhilippineAddressSelect } from "@/components/address/PhilippineAddressSelect";
 import type { Project } from "./types";
 
 type ProgramOption = { project_prog_id: number; mc_ref: string | null };
@@ -35,8 +36,11 @@ function validateProject(project: Project): Record<string, string> {
   if (!code) err.project_code = "Project code is required.";
   else if (code.length > 20) err.project_code = "Max 20 characters.";
   if ((project.project_name ?? "").length > 60) err.project_name = "Max 60 characters.";
-  if ((project.region_code ?? "").length > 4) err.region_code = "Max 4 characters.";
-  if ((project.province_code ?? "").length > 4) err.province_code = "Max 4 characters.";
+  if ((project.region_code ?? "").length > 8) err.region_code = "Max 8 characters.";
+  if ((project.province_code ?? "").length > 12) err.province_code = "Max 12 characters.";
+  if ((project.municipal_code ?? "").length > 14) err.municipal_code = "Max 14 characters.";
+  if ((project.barangay_code ?? "").length > 16) err.barangay_code = "Max 16 characters.";
+  if ((project.district_code ?? "").length > 2) err.district_code = "Max 2 characters.";
   if ((project.lot_type ?? "").length > 1) err.lot_type = "Max 1 character.";
   const totalArea = project.total_area != null ? Number(project.total_area) : null;
   if (totalArea != null && (totalArea < 0 || !Number.isFinite(totalArea))) err.total_area = "Must be ≥ 0.";
@@ -191,37 +195,30 @@ export function ProjectFormSlideOver({
                 <MapPinIcon className="h-4 w-4 shrink-0 text-primary/80" aria-hidden />
                 Location
               </h3>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="region_code" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
-                    <MapPinIcon className="h-4 w-4 shrink-0 text-primary/80" aria-hidden />
-                    Region code
-                  </label>
-                  <input
-                    id="region_code"
-                    type="text"
-                    value={project.region_code ?? ""}
-                    onChange={(e) => update("region_code", e.target.value)}
-                    maxLength={4}
-                    className={inputClass("region_code")}
-                  />
-                  {errors.region_code && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.region_code}</p>}
-                </div>
-                <div>
-                  <label htmlFor="province_code" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
-                    <MapPinIcon className="h-4 w-4 shrink-0 text-primary/80" aria-hidden />
-                    Province code
-                  </label>
-                  <input
-                    id="province_code"
-                    type="text"
-                    value={project.province_code ?? ""}
-                    onChange={(e) => update("province_code", e.target.value)}
-                    maxLength={4}
-                    className={inputClass("province_code")}
-                  />
-                  {errors.province_code && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.province_code}</p>}
-                </div>
+              <div className="mt-3">
+                <PhilippineAddressSelect
+                  value={{
+                    region_code: project.region_code ?? "",
+                    province_code: project.province_code ?? "",
+                    municipal_code: project.municipal_code ?? "",
+                    barangay_code: project.barangay_code ?? "",
+                    district_code: project.district_code ?? "",
+                  }}
+                  onChange={(addr) => {
+                    onChange({
+                      ...project,
+                      region_code: addr.region_code || null,
+                      province_code: addr.province_code || null,
+                      municipal_code: addr.municipal_code || null,
+                      barangay_code: addr.barangay_code || null,
+                      district_code: addr.district_code || null,
+                    });
+                  }}
+                  showDistrictCode
+                  error={
+                    [errors.region_code, errors.province_code, errors.municipal_code, errors.barangay_code, errors.district_code].filter(Boolean).join(" ") || undefined
+                  }
+                />
               </div>
             </section>
 

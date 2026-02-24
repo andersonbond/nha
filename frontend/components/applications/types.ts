@@ -13,6 +13,11 @@ export type Application = {
   sex?: string | null;
   civil_status?: string | null;
   address?: string | null;
+  region_code?: string | null;
+  province_code?: string | null;
+  municipal_code?: string | null;
+  barangay_code?: string | null;
+  district_code?: string | null;
   valid_id_image?: string | null;
   valid_id_type?: string | null;
   created_at?: string | null;
@@ -33,6 +38,11 @@ export const emptyApplication: Omit<Application, "app_id"> & { app_id?: string }
   sex: "",
   civil_status: "",
   address: "",
+  region_code: "",
+  province_code: "",
+  municipal_code: "",
+  barangay_code: "",
+  district_code: "",
   valid_id_image: "",
   valid_id_type: "",
   created_at: null,
