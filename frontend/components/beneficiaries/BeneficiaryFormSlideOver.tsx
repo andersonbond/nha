@@ -1,7 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  XMarkIcon,
+  HashtagIcon,
+  DocumentTextIcon,
+  TagIcon,
+  ArchiveBoxIcon,
+  UserIcon,
+  CalendarIcon,
+  HeartIcon,
+  MapPinIcon,
+  UserGroupIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/outline";
 import { PhilippineAddressSelect } from "@/components/address/PhilippineAddressSelect";
 import type { Beneficiary } from "./types";
 
@@ -78,6 +90,7 @@ export function BeneficiaryFormSlideOver({
 
   const inputClass = (field: string) =>
     `mt-1 w-full rounded-md border bg-[var(--background)] px-3 py-2 text-sm text-[var(--foreground)] ${errors[field] ? "border-red-500" : "border-[var(--border-subtle)]"}`;
+  const labelIconClass = "h-4 w-4 shrink-0 text-[var(--foreground)]/50";
 
   return (
     <div className="fixed inset-0 z-50" aria-modal="true" role="dialog" aria-labelledby="beneficiary-slide-over-title">
@@ -97,26 +110,36 @@ export function BeneficiaryFormSlideOver({
               <h3 className="text-sm font-semibold text-[var(--foreground)]">Identification</h3>
               <div className="mt-3 space-y-3">
                 <div>
-                  <label htmlFor="ben_bin" className="block text-sm font-medium text-[var(--foreground)]/80">BIN</label>
+                  <label htmlFor="ben_bin" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <HashtagIcon className={labelIconClass} aria-hidden /> BIN
+                </label>
                   <input id="ben_bin" type="text" value={beneficiary.bin ?? ""} onChange={(e) => update("bin", e.target.value)} maxLength={MAX.bin} className={inputClass("bin")} />
                   {errors.bin && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.bin}</p>}
                 </div>
                 <div>
-                  <label htmlFor="ben_app_id" className="block text-sm font-medium text-[var(--foreground)]/80">App ID</label>
+                  <label htmlFor="ben_app_id" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <DocumentTextIcon className={labelIconClass} aria-hidden /> App ID
+                </label>
                   <input id="ben_app_id" type="text" value={beneficiary.app_id ?? ""} onChange={(e) => update("app_id", e.target.value)} maxLength={MAX.app_id} className={inputClass("app_id")} />
                   {errors.app_id && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.app_id}</p>}
                 </div>
                 <div>
-                  <label htmlFor="ben_common_code" className="block text-sm font-medium text-[var(--foreground)]/80">Common code</label>
+                  <label htmlFor="ben_common_code" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <TagIcon className={labelIconClass} aria-hidden /> Common code
+                </label>
                   <input id="ben_common_code" type="text" value={beneficiary.common_code ?? ""} onChange={(e) => update("common_code", e.target.value)} maxLength={MAX.common_code} className={inputClass("common_code")} />
                   {errors.common_code && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.common_code}</p>}
                 </div>
                 <div>
-                  <label htmlFor="ben_old_common_code" className="block text-sm font-medium text-[var(--foreground)]/80">Old common code</label>
+                  <label htmlFor="ben_old_common_code" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <ArchiveBoxIcon className={labelIconClass} aria-hidden /> Old common code
+                </label>
                   <input id="ben_old_common_code" type="text" value={beneficiary.old_common_code ?? ""} onChange={(e) => update("old_common_code", e.target.value)} maxLength={MAX.old_common_code} className={inputClass("old_common_code")} />
                 </div>
                 <div>
-                  <label htmlFor="ben_category" className="block text-sm font-medium text-[var(--foreground)]/80">Category</label>
+                  <label htmlFor="ben_category" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <TagIcon className={labelIconClass} aria-hidden /> Category
+                </label>
                   <input id="ben_category" type="text" value={beneficiary.category ?? ""} onChange={(e) => update("category", e.target.value)} maxLength={MAX.category} className={inputClass("category")} />
                   {errors.category && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.category}</p>}
                 </div>
@@ -127,28 +150,38 @@ export function BeneficiaryFormSlideOver({
               <div className="mt-3 space-y-3">
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label htmlFor="ben_last_name" className="block text-sm font-medium text-[var(--foreground)]/80">Last name</label>
+                    <label htmlFor="ben_last_name" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                    <UserIcon className={labelIconClass} aria-hidden /> Last name
+                  </label>
                     <input id="ben_last_name" type="text" value={beneficiary.last_name ?? ""} onChange={(e) => update("last_name", e.target.value)} maxLength={MAX.last_name} className={inputClass("last_name")} />
                     {errors.last_name && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.last_name}</p>}
                   </div>
                   <div>
-                    <label htmlFor="ben_first_name" className="block text-sm font-medium text-[var(--foreground)]/80">First name</label>
+                    <label htmlFor="ben_first_name" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                    <UserIcon className={labelIconClass} aria-hidden /> First name
+                  </label>
                     <input id="ben_first_name" type="text" value={beneficiary.first_name ?? ""} onChange={(e) => update("first_name", e.target.value)} maxLength={MAX.first_name} className={inputClass("first_name")} />
                     {errors.first_name && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.first_name}</p>}
                   </div>
                   <div>
-                    <label htmlFor="ben_middle_name" className="block text-sm font-medium text-[var(--foreground)]/80">Middle name</label>
+                    <label htmlFor="ben_middle_name" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                    <UserIcon className={labelIconClass} aria-hidden /> Middle name
+                  </label>
                     <input id="ben_middle_name" type="text" value={beneficiary.middle_name ?? ""} onChange={(e) => update("middle_name", e.target.value)} maxLength={MAX.middle_name} className={inputClass("middle_name")} />
                     {errors.middle_name && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.middle_name}</p>}
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="ben_birth_date" className="block text-sm font-medium text-[var(--foreground)]/80">Birth date</label>
+                  <label htmlFor="ben_birth_date" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                <CalendarIcon className={labelIconClass} aria-hidden /> Birth date
+              </label>
                   <input id="ben_birth_date" type="date" value={beneficiary.birth_date ?? ""} onChange={(e) => update("birth_date", e.target.value || null)} className={inputClass("birth_date")} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="ben_sex" className="block text-sm font-medium text-[var(--foreground)]/80">Sex</label>
+                    <label htmlFor="ben_sex" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                    <UserIcon className={labelIconClass} aria-hidden /> Sex
+                  </label>
                     <select id="ben_sex" value={normalizeSexForSelect(beneficiary.sex)} onChange={(e) => update("sex", e.target.value || null)} className={inputClass("sex")}>
                       {SEX_OPTIONS.map((opt) => (
                         <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
@@ -157,7 +190,9 @@ export function BeneficiaryFormSlideOver({
                     {errors.sex && <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">{errors.sex}</p>}
                   </div>
                   <div>
-                    <label htmlFor="ben_civil_status" className="block text-sm font-medium text-[var(--foreground)]/80">Civil status</label>
+                    <label htmlFor="ben_civil_status" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                    <HeartIcon className={labelIconClass} aria-hidden /> Civil status
+                  </label>
                     <select id="ben_civil_status" value={beneficiary.civil_status ?? ""} onChange={(e) => update("civil_status", e.target.value || null)} className={inputClass("civil_status")}>
                       {CIVIL_STATUS_OPTIONS.map((opt) => (
                         <option key={opt || "_blank"} value={opt}>{opt || "— Select —"}</option>
@@ -167,7 +202,9 @@ export function BeneficiaryFormSlideOver({
                   </div>
                 </div>
                 <div>
-                  <h4 className="mb-2 text-sm font-medium text-[var(--foreground)]/80">Address</h4>
+                  <h4 className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <MapPinIcon className={labelIconClass} aria-hidden /> Address
+                </h4>
                   <PhilippineAddressSelect
                     value={{
                       region_code: beneficiary.region_code ?? "",
@@ -194,23 +231,33 @@ export function BeneficiaryFormSlideOver({
               <h3 className="text-sm font-semibold text-[var(--foreground)]">Other</h3>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="ben_membership_code" className="block text-sm font-medium text-[var(--foreground)]/80">Membership code</label>
+                  <label htmlFor="ben_membership_code" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <UserGroupIcon className={labelIconClass} aria-hidden /> Membership code
+                </label>
                   <input id="ben_membership_code" type="text" value={beneficiary.membership_code ?? ""} onChange={(e) => update("membership_code", e.target.value)} maxLength={MAX.membership_code} className={inputClass("membership_code")} />
                 </div>
                 <div>
-                  <label htmlFor="ben_inp_date" className="block text-sm font-medium text-[var(--foreground)]/80">Input date</label>
+                  <label htmlFor="ben_inp_date" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <CalendarIcon className={labelIconClass} aria-hidden /> Input date
+                </label>
                   <input id="ben_inp_date" type="date" value={beneficiary.inp_date ?? ""} onChange={(e) => update("inp_date", e.target.value || null)} className={inputClass("inp_date")} />
                 </div>
                 <div>
-                  <label htmlFor="ben_act_tag" className="block text-sm font-medium text-[var(--foreground)]/80">Act tag</label>
+                  <label htmlFor="ben_act_tag" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <TagIcon className={labelIconClass} aria-hidden /> Act tag
+                </label>
                   <input id="ben_act_tag" type="text" value={beneficiary.act_tag ?? ""} onChange={(e) => update("act_tag", e.target.value)} maxLength={MAX.act_tag} className={inputClass("act_tag")} />
                 </div>
                 <div>
-                  <label htmlFor="ben_indicator" className="block text-sm font-medium text-[var(--foreground)]/80">Indicator</label>
+                  <label htmlFor="ben_indicator" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <ChartBarIcon className={labelIconClass} aria-hidden /> Indicator
+                </label>
                   <input id="ben_indicator" type="text" value={beneficiary.indicator ?? ""} onChange={(e) => update("indicator", e.target.value)} maxLength={MAX.indicator} className={inputClass("indicator")} />
                 </div>
                 <div>
-                  <label htmlFor="ben_ssp" className="block text-sm font-medium text-[var(--foreground)]/80">SSP</label>
+                  <label htmlFor="ben_ssp" className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)]/80">
+                  <DocumentTextIcon className={labelIconClass} aria-hidden /> SSP
+                </label>
                   <input id="ben_ssp" type="text" value={beneficiary.ssp ?? ""} onChange={(e) => update("ssp", e.target.value)} maxLength={MAX.ssp} className={inputClass("ssp")} />
                 </div>
               </div>
