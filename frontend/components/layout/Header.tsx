@@ -20,7 +20,15 @@ const SEARCH_DEBOUNCE_MS = 280;
 const MIN_QUERY_LENGTH = 2;
 const BLUR_DELAY_MS = 150;
 
-export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
+export function Header({
+  onMenuClick,
+  sidebarCollapsed,
+  onExpandSidebar,
+}: {
+  onMenuClick?: () => void;
+  sidebarCollapsed?: boolean;
+  onExpandSidebar?: () => void;
+}) {
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -96,7 +104,17 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 md:gap-4 border-b border-[var(--border-subtle)] bg-[var(--background)] px-4 shadow-subtle dark:shadow-subtle-dark md:px-6">
-      {onMenuClick && <SidebarToggle onClick={onMenuClick} />}
+      {/* Mobile: open overlay menu. Desktop when sidebar collapsed: expand sidebar */}
+      {onMenuClick && (
+        <div className="md:hidden">
+          <SidebarToggle onClick={onMenuClick} aria-label="Open menu" />
+        </div>
+      )}
+      {sidebarCollapsed && onExpandSidebar && (
+        <div className="hidden md:block">
+          <SidebarToggle onClick={onExpandSidebar} aria-label="Show sidebar" />
+        </div>
+      )}
       {/* Search - center */}
       <div className="flex flex-1 justify-center max-w-xl mx-auto">
         <div className="relative w-full max-w-md">

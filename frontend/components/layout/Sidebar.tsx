@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -18,6 +19,7 @@ import {
   Cog6ToothIcon,
   XMarkIcon,
   Bars3Icon,
+  ChevronLeftIcon,
 } from "@heroicons/react/24/outline";
 
 const NAV_ITEMS = [
@@ -29,14 +31,25 @@ const NAV_ITEMS = [
   { href: "/lot-management", label: "Lot Management", icon: MapPinIcon },
   { href: "/landholdings", label: "Landholdings Inventory", icon: BuildingOffice2Icon },
   { href: "/ciim", label: "CIIM", icon: BuildingStorefrontIcon },
-  { href: "/lot-award-documentation", label: "Lot Award Documentation", icon: DocumentCheckIcon },
+  //{ href: "/lot-award-documentation", label: "Lot Award Documentation", icon: DocumentCheckIcon },
   { href: "/approval-workflow", label: "Approval Workflow", icon: ClipboardDocumentCheckIcon },
   { href: "/reports", label: "Reports", icon: ChartBarIcon },
   { href: "/settings", label: "Settings", icon: Cog6ToothIcon },
 ];
 
-export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function Sidebar({
+  open,
+  onClose,
+  collapsed,
+  onToggleCollapse,
+}: {
+  open: boolean;
+  onClose: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}) {
   const pathname = usePathname();
+  const isCollapsedOnDesktop = collapsed === true;
 
   return (
     <>
@@ -50,9 +63,11 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
       )}
       <aside
         className={`
-          fixed left-0 top-0 z-50 h-full w-64 shrink-0 border-r border-[var(--border-subtle)] bg-[var(--background)] shadow-subtle dark:shadow-subtle-dark
-          transition-transform duration-200 ease-out md:translate-x-0
+          fixed left-0 top-0 z-50 flex h-full w-64 shrink-0 flex-col border-r border-[var(--border-subtle)] bg-[var(--background)] shadow-subtle dark:shadow-subtle-dark
+          transition-transform duration-200 ease-out
+          md:translate-x-0
           ${open ? "translate-x-0" : "-translate-x-full"}
+          ${isCollapsedOnDesktop ? "md:-translate-x-full" : "md:translate-x-0"}
         `}
       >
         <div className="flex h-14 items-center justify-between border-b border-[var(--border-subtle)] px-4">
@@ -74,7 +89,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
             <XMarkIcon className="h-5 w-5" />
           </button>
         </div>
-        <nav className="flex flex-col gap-0.5 p-2" aria-label="Main">
+        <nav className="flex flex-1 flex-col gap-0.5 overflow-auto p-2" aria-label="Main">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
             const Icon = item.icon;
@@ -97,18 +112,31 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
             );
           })}
         </nav>
+        {onToggleCollapse && !isCollapsedOnDesktop && (
+          <div className="mt-auto border-t border-[var(--border-subtle)] p-2">
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
+              aria-label="Hide sidebar"
+            >
+              <ChevronLeftIcon className="h-5 w-5 shrink-0" aria-hidden />
+              <span className="hidden sm:inline">Hide sidebar</span>
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );
 }
 
-export function SidebarToggle({ onClick }: { onClick: () => void }) {
+export function SidebarToggle({ onClick, "aria-label": ariaLabel }: { onClick: () => void; "aria-label"?: string }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="rounded-md p-2 text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10 md:hidden"
-      aria-label="Open menu"
+      className="rounded-md p-2 text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10"
+      aria-label={ariaLabel ?? "Open menu"}
     >
       <Bars3Icon className="h-6 w-6" />
     </button>

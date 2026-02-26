@@ -49,3 +49,28 @@ def address_cache_set(key: str, value: list[dict[str, str]], ttl_seconds: int = 
         r.set(key, json.dumps(value), ex=ttl_seconds if ttl_seconds else None)
     except Exception:
         pass
+
+
+def address_cache_delete(key: str) -> None:
+    """Delete a single key from the address cache. No-op if Redis unavailable."""
+    r = get_redis()
+    if r is None:
+        return
+    try:
+        r.delete(key)
+    except Exception:
+        pass
+
+
+def address_cache_delete_pattern(pattern: str) -> None:
+    """Delete all keys matching pattern (e.g. address:provinces:*). No-op if Redis unavailable."""
+    r = get_redis()
+    if r is None:
+        return
+    try:
+        keys = r.keys(pattern)
+        if keys:
+            r.delete(*keys)
+    except Exception:
+        pass
+
