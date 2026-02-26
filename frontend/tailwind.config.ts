@@ -6,6 +6,11 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    { pattern: /^md:pl-(0|64)$/ },
+    { pattern: /^md:translate-x-0$/ },
+    { pattern: /^md:-translate-x-full$/ },
+  ],
   darkMode: "class",
   theme: {
     extend: {

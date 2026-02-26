@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -19,6 +20,18 @@ import {
   Bars3Icon,
   ChevronLeftIcon,
 } from "@heroicons/react/24/outline";
+
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const m = window.matchMedia(query);
+    setMatches(m.matches);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    m.addEventListener("change", handler);
+    return () => m.removeEventListener("change", handler);
+  }, [query]);
+  return matches;
+}
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: HomeIcon },
@@ -48,6 +61,12 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const isCollapsedOnDesktop = collapsed === true;
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  // Use inline transform when collapsed on desktop so it works in production
+  // (avoids reliance on Tailwind purging dynamic md:-translate-x-full)
+  const desktopCollapsedStyle =
+    isDesktop && isCollapsedOnDesktop ? { transform: "translateX(-100%)" } : undefined;
 
   return (
     <>
@@ -65,8 +84,10 @@ export function Sidebar({
           transition-transform duration-200 ease-out
           md:translate-x-0
           ${open ? "translate-x-0" : "-translate-x-full"}
-          ${isCollapsedOnDesktop ? "md:-translate-x-full" : "md:translate-x-0"}
+          ${!isCollapsedOnDesktop ? "md:translate-x-0" : ""}
         `}
+        style={desktopCollapsedStyle}
+        data-collapsed={isCollapsedOnDesktop ? "true" : undefined}
       >
         <div className="flex h-14 items-center justify-between border-b border-[var(--border-subtle)] px-4">
           <Link href="/" className="flex shrink-0 items-center" aria-label="LIS Home">
