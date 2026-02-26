@@ -12,10 +12,12 @@ import {
   XMarkIcon,
   MapIcon,
   ListBulletIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
 import { apiFetch } from "@/app/lib/api";
 import type { Lot } from "@/app/lib/mockData";
 import { LotTable } from "@/components/lot-management/LotTable";
+import { LotCreationFormSlideOver } from "@/components/lot-management/LotCreationFormSlideOver";
 
 const SatelliteMap = dynamic(
   () => import("@/components/lot-management/SatelliteMap").then((m) => m.SatelliteMap),
@@ -91,6 +93,7 @@ export default function LotManagementPage() {
 
   const [lots, setLots] = useState<Lot[]>([]);
   const [lotsLoading, setLotsLoading] = useState(false);
+  const [createLotOpen, setCreateLotOpen] = useState(false);
   const lotsQuery = useMemo(() => {
     const params = new URLSearchParams();
     if (lotNumber.trim()) params.set("lot_number", lotNumber.trim());
@@ -169,6 +172,14 @@ export default function LotManagementPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCreateLotOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+                >
+                  <PlusIcon className="h-4 w-4 shrink-0" aria-hidden />
+                  Create Lot
+                </button>
                 <span
                   className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
                   aria-live="polite"
@@ -296,6 +307,12 @@ export default function LotManagementPage() {
             </div>
           </section>
         )}
+
+        <LotCreationFormSlideOver
+          open={createLotOpen}
+          onClose={() => setCreateLotOpen(false)}
+          onSave={() => setCreateLotOpen(false)}
+        />
 
         {activeSection === "lot-award" && (
           <section
