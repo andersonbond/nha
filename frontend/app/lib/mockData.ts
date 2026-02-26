@@ -259,7 +259,7 @@ let programs: Program[] = initialPrograms.map((p) => ({ ...p }));
 let projects: Project[] = initialProjects.map((p) => ({ ...p }));
 let applications: Application[] = initialApplications.map((a) => ({ ...a }));
 let beneficiaries: Beneficiary[] = initialBeneficiaries.map((b) => ({ ...b }));
-let lots: Lot[] = initialLots.map((l) => ({ ...l }));
+const lots: Lot[] = initialLots.map((l) => ({ ...l }));
 
 /** Placeholder CIIM units for UI; exported for use in CIIM page when no backend. */
 export const MOCK_CIIM_UNITS: CIIMUnit[] = initialCIIMUnits.map((u) => ({ ...u }));

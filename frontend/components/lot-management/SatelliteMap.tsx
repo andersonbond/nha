@@ -23,32 +23,40 @@ export function SatelliteMap({
 }: SatelliteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const centerLat = center[0];
+  const centerLng = center[1];
 
   useEffect(() => {
     if (typeof window === "undefined" || !containerRef.current) return;
 
-    const L = require("leaflet");
+    let cancelled = false;
 
-    if (mapRef.current) return;
-    const map = L.map(containerRef.current, {
-      center,
-      zoom,
-      zoomControl: true,
+    void import("leaflet").then((L) => {
+      if (cancelled || !containerRef.current) return;
+      if (mapRef.current) return;
+      const map = L.default.map(containerRef.current, {
+        center: [centerLat, centerLng],
+        zoom,
+        zoomControl: true,
+      });
+      L.default.control
+        .zoom({ position: "topright" })
+        .addTo(map);
+      L.default.tileLayer(ESRI_SATELLITE_URL, {
+        attribution: ESRI_ATTRIBUTION,
+        maxZoom: 18,
+      }).addTo(map);
+      mapRef.current = map;
     });
-    L.control
-      .zoom({ position: "topright" })
-      .addTo(map);
-    L.tileLayer(ESRI_SATELLITE_URL, {
-      attribution: ESRI_ATTRIBUTION,
-      maxZoom: 18,
-    }).addTo(map);
-    mapRef.current = map;
 
     return () => {
-      map.remove();
-      mapRef.current = null;
+      cancelled = true;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, [center[0], center[1], zoom]);
+  }, [centerLat, centerLng, zoom]);
 
   return (
     <div

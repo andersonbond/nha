@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -14,7 +13,6 @@ import {
   MapPinIcon,
   BuildingOffice2Icon,
   BuildingStorefrontIcon,
-  DocumentCheckIcon,
   ChartBarIcon,
   Cog6ToothIcon,
   XMarkIcon,

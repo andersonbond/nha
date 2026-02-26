@@ -38,15 +38,6 @@ function formatMoney(n: number): string {
   return `₱${n.toLocaleString()}`;
 }
 
-function formatDate(s: string | null | undefined): string {
-  if (!s) return "—";
-  try {
-    return new Date(s).toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" });
-  } catch {
-    return s;
-  }
-}
-
 function formatUnitType(t: CIIMUnitType): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
