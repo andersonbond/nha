@@ -7,7 +7,23 @@ import {
   ClipboardDocumentListIcon,
   DocumentTextIcon,
   UserGroupIcon,
+  Squares2X2Icon,
 } from "@heroicons/react/24/outline";
+
+const SEARCH_PAGES: { label: string; href: string }[] = [
+  { label: "Dashboard", href: "/" },
+  { label: "Applications", href: "/applications" },
+  { label: "Beneficiaries", href: "/beneficiaries" },
+  { label: "Projects", href: "/projects" },
+  { label: "Programs", href: "/programs" },
+  { label: "Lot Management", href: "/lot-management" },
+  { label: "Landholdings Inventory", href: "/landholdings" },
+  { label: "CIIM", href: "/ciim" },
+  { label: "Approval Workflow", href: "/approval-workflow" },
+  { label: "Reports", href: "/reports" },
+  { label: "User Access Management", href: "/user-access-management" },
+  { label: "Settings", href: "/settings" },
+];
 
 type SearchDropdownProps = {
   query: string;
@@ -64,13 +80,20 @@ function Section({
 export function SearchDropdown({ query, results, loading, open, onClose }: SearchDropdownProps) {
   if (!open) return null;
 
-  const isEmpty =
-    !loading &&
+  const phrase = query.trim().toLowerCase();
+  const minQueryLength = 2;
+  const pageMatches =
+    phrase.length >= minQueryLength
+      ? SEARCH_PAGES.filter((p) => p.label.toLowerCase().includes(phrase))
+      : [];
+
+  const dataEmpty =
     results &&
     results.projects.length === 0 &&
     results.programs.length === 0 &&
     results.applications.length === 0 &&
     results.beneficiaries.length === 0;
+  const isEmpty = !loading && results && dataEmpty && pageMatches.length === 0;
 
   return (
     <div
@@ -132,6 +155,14 @@ export function SearchDropdown({ query, results, loading, open, onClose }: Searc
                   return [ben.last_name, ben.first_name].filter(Boolean).join(", ") || `#${ben.id}`;
                 }}
                 getSublabel={(b) => (b as { bin?: string }).bin ?? ""}
+                onSelect={onClose}
+              />
+              <Section
+                title="Pages"
+                icon={Squares2X2Icon}
+                items={pageMatches}
+                getHref={(p) => (p as { href: string }).href}
+                getLabel={(p) => (p as { label: string }).label}
                 onSelect={onClose}
               />
             </>

@@ -19,6 +19,7 @@ import {
   XMarkIcon,
   Bars3Icon,
   ChevronLeftIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 
 function useMediaQuery(query: string): boolean {
@@ -45,6 +46,7 @@ const NAV_ITEMS = [
   //{ href: "/lot-award-documentation", label: "Lot Award Documentation", icon: DocumentCheckIcon },
   { href: "/approval-workflow", label: "Approval Workflow", icon: ClipboardDocumentCheckIcon },
   { href: "/reports", label: "Reports", icon: ChartBarIcon },
+  { href: "/user-access-management", label: "User Access Management", icon: ShieldCheckIcon },
   { href: "/settings", label: "Settings", icon: Cog6ToothIcon },
 ];
 

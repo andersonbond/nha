@@ -196,7 +196,24 @@ sudo apt update
 sudo apt install -y python3.11 python3.11-venv python3-pip postgresql postgresql-client
 ```
 
-**2. Create app user and directory (optional but recommended)**
+**2. Start and enable PostgreSQL**
+
+After installing PostgreSQL, start the service and enable it to run at boot:
+
+```bash
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+Check that it is running:
+
+```bash
+sudo systemctl status postgresql
+```
+
+You should see `active (running)`. To create a database and user for the LIS app, see **[DEPLOYMENT_LINUX.md](DEPLOYMENT_LINUX.md)** (section “Create database and user”).
+
+**3. Create app user and directory (optional but recommended)**
 
 ```bash
 sudo useradd -r -s /bin/false lisapp
@@ -204,18 +221,47 @@ sudo mkdir -p /opt/lis/server
 sudo chown lisapp:lisapp /opt/lis/server
 ```
 
-**3. Deploy code** (e.g. clone repo or copy files into `/opt/lis/server`).
+**4. Deploy code**
 
-**4. Create virtual environment and install dependencies**
+Deploy via **GitHub** (recommended): you do **not** need `git init` — use **`git clone`** to get the repository onto the server.
+
+- **First-time deploy:** clone the repo, then use the `server` directory as your app directory.
+
+  ```bash
+  # If /opt/lis doesn't exist: sudo mkdir -p /opt/lis
+  cd /opt/lis
+  git clone https://github.com/YOUR_ORG/nha-lis.git
+  # App code is in nha-lis/server; use that path for the steps below
+  cd nha-lis/server
+  ```
+
+  Replace `YOUR_ORG/nha-lis` with your actual GitHub org/repo (and use SSH if you prefer, e.g. `git@github.com:YOUR_ORG/nha-lis.git`). If the server directory is not at `server/` in the repo, adjust the path. In the steps below, use `/opt/lis/nha-lis/server` as the app directory (or `/opt/lis/server` if you copy only the `server` folder there). If you created the `lisapp` user (step 2), give it ownership of the clone: `sudo chown -R lisapp:lisapp /opt/lis/nha-lis`.
+
+- **Later updates:** pull the latest code, then restart the app.
+
+  ```bash
+  cd /opt/lis/nha-lis
+  git pull
+  cd server
+  # Reinstall deps if requirements changed, re-run migrations, then restart the service
+  source .venv/bin/activate
+  pip install -r requirements.txt
+  alembic upgrade head
+  sudo systemctl restart lis-api
+  ```
+
+Alternatively, copy the app files manually into `/opt/lis/server` (e.g. via rsync or an archive).
+
+**5. Create virtual environment and install dependencies**
 
 ```bash
-cd /opt/lis/server
+cd /opt/lis/server   # or /opt/lis/nha-lis/server if you deployed via git clone
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**5. Configure environment**
+**6. Configure environment**
 
 ```bash
 cp .env.example .env
@@ -223,21 +269,21 @@ cp .env.example .env
 nano .env
 ```
 
-**6. Run migrations**
+**7. Run migrations**
 
 ```bash
 source .venv/bin/activate
 alembic upgrade head
 ```
 
-**7. Run with Uvicorn (production: no `--reload`, optional workers)**
+**8. Run with Uvicorn (production: no `--reload`, optional workers)**
 
 ```bash
 source .venv/bin/activate
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
 ```
 
-**8. Run as a systemd service (recommended)**
+**9. Run as a systemd service (recommended)**
 
 Create `/etc/systemd/system/lis-api.service`:
 
@@ -269,7 +315,7 @@ sudo systemctl start lis-api
 sudo systemctl status lis-api
 ```
 
-**9. Put a reverse proxy in front (e.g. Nginx)** for TLS and to forward to `http://127.0.0.1:8000`. Example Nginx location:
+**10. Put a reverse proxy in front (e.g. Nginx)** for TLS and to forward to `http://127.0.0.1:8000`. Example Nginx location:
 
 ```nginx
 location /api/ {

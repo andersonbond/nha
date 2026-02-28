@@ -16,6 +16,11 @@ type RejectTarget =
   | { type: "program"; project_prog_id: number; name: string }
   | null;
 
+type ApproveTarget =
+  | { type: "project"; project: Project }
+  | { type: "program"; program: Program }
+  | null;
+
 function formatNum(n: number | null | undefined) {
   if (n == null) return "—";
   return n.toLocaleString();
@@ -27,6 +32,7 @@ export default function ApprovalWorkflowPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [approveTarget, setApproveTarget] = useState<ApproveTarget>(null);
   const [rejectTarget, setRejectTarget] = useState<RejectTarget>(null);
   const [rejectReason, setRejectReason] = useState("");
 
@@ -61,6 +67,7 @@ export default function ApprovalWorkflowPage() {
     })
       .then(() => {
         setPendingProjects((prev) => prev.filter((p) => p.project_code !== project.project_code));
+        setApproveTarget(null);
       })
       .catch((err) => setError(err instanceof Error ? err.message : String(err)))
       .finally(() => setActionLoading(null));
@@ -77,9 +84,27 @@ export default function ApprovalWorkflowPage() {
     })
       .then(() => {
         setPendingPrograms((prev) => prev.filter((p) => (p.project_prog_id ?? 0) !== id));
+        setApproveTarget(null);
       })
       .catch((err) => setError(err instanceof Error ? err.message : String(err)))
       .finally(() => setActionLoading(null));
+  }
+
+  function openApproveProject(project: Project) {
+    setApproveTarget({ type: "project", project });
+  }
+
+  function openApproveProgram(program: Program) {
+    setApproveTarget({ type: "program", program });
+  }
+
+  function confirmApprove() {
+    if (!approveTarget) return;
+    if (approveTarget.type === "project") {
+      handleApproveProject(approveTarget.project);
+    } else {
+      handleApproveProgram(approveTarget.program);
+    }
   }
 
   function openRejectProject(project: Project) {
@@ -256,7 +281,7 @@ export default function ApprovalWorkflowPage() {
                               <div className="flex justify-end gap-2">
                                 <button
                                   type="button"
-                                  onClick={() => handleApproveProject(project)}
+                                  onClick={() => openApproveProject(project)}
                                   disabled={!!actionLoading}
                                   className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
                                 >
@@ -344,7 +369,7 @@ export default function ApprovalWorkflowPage() {
                               <div className="flex justify-end gap-2">
                                 <button
                                   type="button"
-                                  onClick={() => handleApproveProgram(program)}
+                                  onClick={() => openApproveProgram(program)}
                                   disabled={!!actionLoading}
                                   className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
                                 >
@@ -376,6 +401,119 @@ export default function ApprovalWorkflowPage() {
             )}
           </section>
         </>
+      )}
+
+      {/* Approve confirmation modal */}
+      {approveTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="approve-title"
+        >
+          <div
+            className="absolute inset-0 bg-black/40"
+            aria-hidden
+            onClick={() => setApproveTarget(null)}
+          />
+          <div className="relative w-full max-w-lg rounded-lg border border-[var(--border-subtle)] bg-[var(--background)] p-5 shadow-lg">
+            <h2 id="approve-title" className="flex items-center gap-2 text-lg font-semibold text-[var(--foreground)]">
+              <CheckCircleIcon className="h-5 w-5 text-primary" aria-hidden />
+              Confirm approval
+            </h2>
+            <p className="mt-1 text-sm text-[var(--foreground)]/80">
+              Review the details below before approving.
+            </p>
+
+            <div className="mt-4 rounded-md border border-[var(--border-subtle)] bg-[var(--background-elevated)]/50 p-4">
+              {approveTarget.type === "project" ? (
+                <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Type</dt>
+                    <dd className="mt-0.5 font-medium text-[var(--foreground)]">Project</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Project code</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.project.project_code}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Project name</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.project.project_name ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Program ID</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.project.project_prog_id ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Region</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.project.region_code ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Project cost</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{formatNum(approveTarget.project.project_cost)}</dd>
+                  </div>
+                  {approveTarget.project.lot_type != null && approveTarget.project.lot_type !== "" && (
+                    <div>
+                      <dt className="font-medium text-[var(--foreground)]/70">Lot type</dt>
+                      <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.project.lot_type}</dd>
+                    </div>
+                  )}
+                </dl>
+              ) : (
+                <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Type</dt>
+                    <dd className="mt-0.5 font-medium text-[var(--foreground)]">Program</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">ID</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.program.project_prog_id ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">MC Ref</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.program.mc_ref ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Interest rate</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.program.interest_rate ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Delinquency rate</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.program.delinquency_rate ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-[var(--foreground)]/70">Max term (years)</dt>
+                    <dd className="mt-0.5 text-[var(--foreground)]">{approveTarget.program.max_term_yrs ?? "—"}</dd>
+                  </div>
+                </dl>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setApproveTarget(null)}
+                disabled={!!actionLoading}
+                className="rounded-md border border-[var(--border-subtle)] px-4 py-2 text-sm font-medium text-[var(--foreground)] hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmApprove}
+                disabled={!!actionLoading}
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              >
+                {actionLoading ? (
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <CheckCircleIcon className="h-4 w-4" />
+                )}
+                Confirm Approve
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Reject reason modal */}

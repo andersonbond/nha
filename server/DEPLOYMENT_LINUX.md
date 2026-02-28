@@ -313,15 +313,75 @@ sudo journalctl -u lis-api -f
 
 ## 9. Reverse proxy (Nginx)
 
-To serve the API over HTTPS and hide the app port, use Nginx (or Apache) as a reverse proxy.
+Nginx acts as a reverse proxy: it receives HTTP/HTTPS requests and forwards them to the LIS API (Uvicorn on port 8000). This lets you serve the API on port 80/443, add TLS, and hide the app server.
 
-**Install Nginx (Ubuntu/Debian)**
+### Install Nginx
+
+**Ubuntu / Debian**
 
 ```bash
+sudo apt update
 sudo apt install -y nginx
 ```
 
-**Example site config** (`/etc/nginx/sites-available/lis-api`):
+Start and enable Nginx so it runs at boot:
+
+```bash
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+
+Check status:
+
+```bash
+sudo systemctl status nginx
+```
+
+**RHEL / Rocky Linux / AlmaLinux / CentOS / Fedora**
+
+```bash
+sudo dnf install -y nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
+```
+
+**Open firewall (if enabled)**
+
+- **Ubuntu/Debian (ufw):**
+
+  ```bash
+  sudo ufw allow 'Nginx Full'
+  sudo ufw allow OpenSSH
+  sudo ufw enable
+  sudo ufw status
+  ```
+
+- **RHEL/Rocky/Firewalld:**
+
+  ```bash
+  sudo firewall-cmd --permanent --add-service=http
+  sudo firewall-cmd --permanent --add-service=https
+  sudo firewall-cmd --reload
+  ```
+
+### Create the site configuration
+
+Create a config file for the LIS API (replace `api.yourdomain.com` with your domain or server IP).
+
+```bash
+sudo nano /etc/nginx/sites-available/lis-api
+```
+
+**On RHEL/Rocky/Alma/CentOS/Fedora** there is no `sites-available` by default. Create the file in `/etc/nginx/conf.d/` instead, e.g.:
+
+```bash
+sudo nano /etc/nginx/conf.d/lis-api.conf
+```
+
+Paste one of the configs below.
+
+**Option A: API on the root** (e.g. `https://api.yourdomain.com/`)
 
 ```nginx
 server {
@@ -338,20 +398,93 @@ server {
 }
 ```
 
-Enable and reload:
+**Option B: API under a path** (e.g. `https://yourdomain.com/api/`)
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Here, requests to `https://yourdomain.com/api/v1/...` are forwarded to `http://127.0.0.1:8000/v1/...`. Ensure your FastAPI app is mounted at `/` (default) or adjust `proxy_pass` and the frontend base URL accordingly.
+
+### Enable the site and reload Nginx
+
+**Ubuntu / Debian** (sites-available/sites-enabled):
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/lis-api /etc/nginx/sites-enabled/
+```
+
+**RHEL/Rocky/Alma/CentOS/Fedora**: no symlink needed if you created `/etc/nginx/conf.d/lis-api.conf`.
+
+**Test configuration and reload:**
+
+```bash
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-Add TLS with Let’s Encrypt (optional):
+If `nginx -t` reports an error, fix the config before reloading. Then verify the API is reachable:
+
+```bash
+curl -H "Host: api.yourdomain.com" http://localhost/
+# or
+curl http://localhost/api/health
+```
+
+(Adjust the path if you used Option B and your app exposes `/health`.)
+
+### Add TLS with Let’s Encrypt (recommended for production)
+
+Install Certbot and obtain a certificate; Certbot will adjust your Nginx config for HTTPS.
+
+**Ubuntu / Debian**
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d api.yourdomain.com
 ```
+
+**RHEL / Rocky / Alma / CentOS**
+
+```bash
+sudo dnf install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d api.yourdomain.com
+```
+
+**Fedora**
+
+```bash
+sudo dnf install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d api.yourdomain.com
+```
+
+Follow the prompts. Certbot will add a redirect from HTTP to HTTPS and set up automatic renewal. Test renewal with:
+
+```bash
+sudo certbot renew --dry-run
+```
+
+### Useful Nginx commands
+
+| Action            | Command |
+|-------------------|--------|
+| Test config       | `sudo nginx -t` |
+| Reload (no downtime) | `sudo systemctl reload nginx` |
+| Restart           | `sudo systemctl restart nginx` |
+| Status            | `sudo systemctl status nginx` |
+| View error log    | `sudo tail -f /var/log/nginx/error.log` |
+| View access log   | `sudo tail -f /var/log/nginx/access.log` |
 
 ---
 
