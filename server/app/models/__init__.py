@@ -12,7 +12,10 @@ from app.models.program import Program
 from app.models.program_classification import ProgramClassification
 from app.models.project import Project
 from app.models.property import Property
+from app.models.user_account import UserAccount
+from app.models.user_account_role import UserAccountRole
 from app.models.user_log import UserLog
+from app.models.user_role import UserRole
 
 __all__ = [
     "AddressBarangay",
@@ -27,5 +30,8 @@ __all__ = [
     "ProgramClassification",
     "Project",
     "Property",
+    "UserAccount",
+    "UserAccountRole",
     "UserLog",
+    "UserRole",
 ]
